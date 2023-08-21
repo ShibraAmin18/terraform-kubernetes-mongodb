@@ -100,7 +100,7 @@ resource "helm_release" "mongodb_backup" {
       azure_container_name       = var.bucket_provider_type == "azure" ? var.azure_container_name : ""
       cron_for_full_backup       = var.mongodb_backup_config.cron_for_full_backup,
       bucket_provider_type       = var.bucket_provider_type,
-      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn: ${module.aws[0].iam_role_arn_backup}"  : var.bucket_provider_type == "gcp" ? "iam.gke.io/gcp-service-account: ${module.gcp[0].service_account_backup}" : var.bucket_provider_type == "azure" ? "azure.com/user-assigned-identity: ${module.azure[0].mongodb_backup_role_assignment}" : ""
+      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn: ${module.aws[0].iam_role_arn_backup}"  : var.bucket_provider_type == "gcp" ? "iam.gke.io/gcp-service-account: ${module.gcp[0].service_account_backup}" : var.bucket_provider_type == "azure" ? "azure.com/user-assigned-identity: ${module.azure[0].service_account_backup}" : ""
     })
   ]
 }
@@ -123,7 +123,7 @@ resource "helm_release" "mongodb_restore" {
       azure_storage_account_key  = var.bucket_provider_type == "azure" ? var.azure_storage_account_key : ""
       azure_container_name       = var.bucket_provider_type == "azure" ? var.azure_container_name : ""
       bucket_provider_type       = var.bucket_provider_type,
-      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn: ${module.aws[0].iam_role_arn_restore}" : "iam.gke.io/gcp-service-account: ${module.gcp[0].service_account_restore}"
+      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn: ${module.aws[0].iam_role_arn_restore}"  : var.bucket_provider_type == "gcp" ? "iam.gke.io/gcp-service-account: ${module.gcp[0].service_account_restore}" : var.bucket_provider_type == "azure" ? "azure.com/user-assigned-identity: ${module.azure[0].service_account_restore}" : ""
     })
   ]
 }

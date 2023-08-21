@@ -13,7 +13,7 @@ locals {
 }
 
 module "mongodb" {
-  source                  = "../../../"
+  source                  = "squareops/mongodb/kubernetes"
   cluster_name            = "dev-cluster"
   resource_group_name     = "prod-skaf-rg"
   resource_group_location = "eastus"
