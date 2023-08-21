@@ -70,6 +70,19 @@ module "gcp" {
   metric_exporter_pasword            = var.mongodb_custom_credentials_enabled ? "" : random_password.mongodb_exporter_password[0].result
 }
 
+module "azure" {
+  source                             = "./provider/azure"
+  count                              = var.bucket_provider_type == "azure" ? 1 : 0
+  resource_group_name                = var.resource_group_name
+  resource_group_location            = var.resource_group_location
+  environment                        = var.mongodb_config.environment
+  mongodb_config                     = var.mongodb_config
+  mongodb_custom_credentials_enabled = var.mongodb_custom_credentials_enabled
+  mongodb_custom_credentials_config  = var.mongodb_custom_credentials_config
+  root_password                      = var.mongodb_custom_credentials_enabled ? "" : random_password.mongodb_root_password[0].result
+  metric_exporter_pasword            = var.mongodb_custom_credentials_enabled ? "" : random_password.mongodb_exporter_password[0].result
+}
+
 resource "helm_release" "mongodb_backup" {
   depends_on = [helm_release.mongodb]
   count      = var.mongodb_backup_enabled ? 1 : 0
@@ -82,9 +95,12 @@ resource "helm_release" "mongodb_backup" {
       mongodb_root_user_password = var.mongodb_custom_credentials_enabled ? var.mongodb_custom_credentials_config.root_password : random_password.mongodb_root_password[0].result,
       bucket_uri                 = var.mongodb_backup_config.bucket_uri,
       s3_bucket_region           = var.bucket_provider_type == "s3" ? var.mongodb_backup_config.s3_bucket_region : "",
+      azure_storage_account_name = var.bucket_provider_type == "azure" ? var.azure_storage_account_name : ""
+      azure_storage_account_key  = var.bucket_provider_type == "azure" ? var.azure_storage_account_key : ""
+      azure_container_name       = var.bucket_provider_type == "azure" ? var.azure_container_name : ""
       cron_for_full_backup       = var.mongodb_backup_config.cron_for_full_backup,
       bucket_provider_type       = var.bucket_provider_type,
-      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn: ${module.aws[0].iam_role_arn_backup}" : "iam.gke.io/gcp-service-account: ${module.gcp[0].service_account_backup}"
+      annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn: ${module.aws[0].iam_role_arn_backup}"  : var.bucket_provider_type == "gcp" ? "iam.gke.io/gcp-service-account: ${module.gcp[0].service_account_backup}" : var.bucket_provider_type == "azure" ? "azure.com/user-assigned-identity: ${module.azure[0].mongodb_backup_role_assignment}" : ""
     })
   ]
 }
@@ -103,6 +119,9 @@ resource "helm_release" "mongodb_restore" {
       bucket_uri                 = var.mongodb_restore_config.bucket_uri,
       file_name                  = var.mongodb_restore_config.file_name,
       s3_bucket_region           = var.bucket_provider_type == "s3" ? var.mongodb_restore_config.s3_bucket_region : "",
+      azure_storage_account_name = var.bucket_provider_type == "azure" ? var.azure_storage_account_name : ""
+      azure_storage_account_key  = var.bucket_provider_type == "azure" ? var.azure_storage_account_key : ""
+      azure_container_name       = var.bucket_provider_type == "azure" ? var.azure_container_name : ""
       bucket_provider_type       = var.bucket_provider_type,
       annotations                = var.bucket_provider_type == "s3" ? "eks.amazonaws.com/role-arn: ${module.aws[0].iam_role_arn_restore}" : "iam.gke.io/gcp-service-account: ${module.gcp[0].service_account_restore}"
     })

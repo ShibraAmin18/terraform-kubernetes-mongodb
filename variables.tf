@@ -1,33 +1,15 @@
 variable "mongodb_config" {
   type = any
   default = {
-    name                             = ""
-    environment                      = ""
-    volume_size                      = ""
-    architecture                     = ""
-    replica_count                    = 2
-    values_yaml                      = ""
-    storage_class_name               = ""
-    store_password_to_secret_manager = true
+    name               = ""
+    environment        = ""
+    volume_size        = ""
+    architecture       = ""
+    replica_count      = 2
+    values_yaml        = ""
+    storage_class_name = ""
   }
   description = "Specify the configuration settings for Mongodb, including the name, environment, storage options, replication settings, and custom YAML values."
-}
-
-variable "mongodb_custom_credentials_enabled" {
-  type        = bool
-  default     = false
-  description = "Specifies whether to enable custom credentials for MongoDB database."
-}
-
-variable "mongodb_custom_credentials_config" {
-  type = any
-  default = {
-    root_user                = ""
-    root_password            = ""
-    metric_exporter_user     = ""
-    metric_exporter_password = ""
-  }
-  description = "Specify the configuration settings for Mongodb to pass custom credentials during creation."
 }
 
 variable "chart_version" {
@@ -122,4 +104,51 @@ variable "bucket_provider_type" {
   type        = string
   default     = "gcs"
   description = "Choose what type of provider you want (s3, gcs)"
+}
+
+variable "resource_group_name" {
+  description = "Azure Resource Group name"
+  type        = string
+  default     = ""
+}
+
+variable "resource_group_location" {
+  description = "Azure region"
+  type        = string
+  default     = "East US"
+}
+
+variable "azure_storage_account_name" {
+  description = "Azure storage account name"
+  type        = string
+  default     = ""
+}
+
+variable "azure_storage_account_key" {
+  description = "Azure storage account key"
+  type        = string
+  default     = ""
+}
+
+variable "azure_container_name" {
+  description = "Azure container name"
+  type        = string
+  default     = ""
+}
+
+variable "mongodb_custom_credentials_enabled" {
+  type        = bool
+  default     = false
+  description = "Specifies whether to enable custom credentials for MongoDB database."
+}
+
+variable "mongodb_custom_credentials_config" {
+  type = any
+  default = {
+    root_user                = ""
+    root_password            = ""
+    metric_exporter_user     = ""
+    metric_exporter_password = ""
+  }
+  description = "Specify the configuration settings for Mongodb to pass custom credentials during creation."
 }
